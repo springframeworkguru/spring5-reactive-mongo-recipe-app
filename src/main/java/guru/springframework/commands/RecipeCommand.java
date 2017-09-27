@@ -15,14 +15,17 @@ import guru.springframework.domain.Difficulty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @FieldDefaults(level = PRIVATE)
+@ToString
 public class RecipeCommand {
-    private String id;
+
+    String id;
 
     @NotBlank
     @Size(min = 3, max = 255)
