@@ -1,12 +1,13 @@
 package guru.springframework.converters;
 
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
+
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.domain.Category;
 import guru.springframework.domain.Recipe;
 import lombok.Synchronized;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 
 /**
  * Created by jt on 6/21/17.
@@ -29,10 +30,6 @@ public class RecipeToRecipeCommand implements Converter<Recipe, RecipeCommand>{
     @Nullable
     @Override
     public RecipeCommand convert(Recipe source) {
-        if (source == null) {
-            return null;
-        }
-
         final RecipeCommand command = new RecipeCommand();
         command.setId(source.getId());
         command.setCookTime(source.getCookTime());
