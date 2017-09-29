@@ -1,26 +1,23 @@
 package guru.springframework.converters;
 
+import static lombok.AccessLevel.PRIVATE;
+
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import guru.springframework.commands.IngredientCommand;
 import guru.springframework.domain.Ingredient;
-import lombok.Synchronized;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
-/**
- * Created by jt on 6/21/17.
- */
 @Component
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class IngredientToIngredientCommand implements Converter<Ingredient, IngredientCommand> {
 
-    private final UnitOfMeasureToUnitOfMeasureCommand uomConverter;
+    UnitOfMeasureToUnitOfMeasureCommand uomConverter;
 
-    public IngredientToIngredientCommand(UnitOfMeasureToUnitOfMeasureCommand uomConverter) {
-        this.uomConverter = uomConverter;
-    }
-
-    @Synchronized
     @Nullable
     @Override
     public IngredientCommand convert(Ingredient ingredient) {
@@ -28,12 +25,11 @@ public class IngredientToIngredientCommand implements Converter<Ingredient, Ingr
             return null;
         }
 
-        IngredientCommand ingredientCommand = new IngredientCommand();
-        ingredientCommand.setId(ingredient.getId());
-
-        ingredientCommand.setAmount(ingredient.getAmount());
-        ingredientCommand.setDescription(ingredient.getDescription());
-        ingredientCommand.setUom(uomConverter.convert(ingredient.getUom()));
-        return ingredientCommand;
+        IngredientCommand command = new IngredientCommand();
+        command.setId(ingredient.getId());
+        command.setAmount(ingredient.getAmount());
+        command.setDescription(ingredient.getDescription());
+        command.setUom(uomConverter.convert(ingredient.getUom()));
+        return command;
     }
 }
