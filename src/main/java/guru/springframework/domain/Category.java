@@ -1,21 +1,30 @@
 package guru.springframework.domain;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Set;
 
-/**
- * Created by jt on 6/13/17.
- */
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
+
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode(exclude = { "recipes" })
+@FieldDefaults(level = PRIVATE)
 @Document
 public class Category {
+
     @Id
-    private String id;
-    private String description;
-    private Set<Recipe> recipes;
+    String id;
+
+    String description;
+
+    Set<Recipe> recipes;
 }

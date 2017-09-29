@@ -21,17 +21,29 @@ public class Recipe {
 
     @Id
     String id;
+
     String description;
+
     Integer prepTime;
+
     Integer cookTime;
+
     Integer servings;
+
     String source;
+
     String url;
+
     String directions;
+
     Set<Ingredient> ingredients = new HashSet<>();
+
     byte[] image;
+
     Difficulty difficulty;
+
     Notes notes;
+
     Set<Category> categories = new HashSet<>();
 
     public void setNotes(Notes notes) {
@@ -40,7 +52,7 @@ public class Recipe {
         }
     }
 
-    public void addIngredient(Ingredient ingredient){
+    public void addIngredient(Ingredient ingredient) {
         ingredients.add(ingredient);
     }
 }
