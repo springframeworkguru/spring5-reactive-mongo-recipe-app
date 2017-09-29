@@ -1,49 +1,39 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.UnitOfMeasureCommand;
-import guru.springframework.domain.UnitOfMeasure;
-import org.junit.Before;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import guru.springframework.commands.UnitOfMeasureCommand;
+import guru.springframework.domain.UnitOfMeasure;
 
-/**
- * Created by jt on 6/21/17.
- */
 public class UnitOfMeasureToUnitOfMeasureCommandTest {
 
-    public static final String DESCRIPTION = "description";
-    public static final String LONG_VALUE = "1";
+    private UnitOfMeasureToUnitOfMeasureCommand converter = new UnitOfMeasureToUnitOfMeasureCommand();
 
-    UnitOfMeasureToUnitOfMeasureCommand converter;
-
-    @Before
-    public void setUp() throws Exception {
-        converter = new UnitOfMeasureToUnitOfMeasureCommand();
+    @Test
+    public void testNullObjectConvert() {
+        assertThat(converter.convert(null)).isNull();
     }
 
     @Test
-    public void testNullObjectConvert() throws Exception {
-        assertNull(converter.convert(null));
+    public void testEmptyObj() {
+        assertThat(converter.convert(new UnitOfMeasure())).isNotNull();
     }
 
     @Test
-    public void testEmptyObj() throws Exception {
-        assertNotNull(converter.convert(new UnitOfMeasure()));
-    }
-
-    @Test
-    public void convert() throws Exception {
+    public void convert() {
         //given
         UnitOfMeasure uom = new UnitOfMeasure();
-        uom.setId(LONG_VALUE);
-        uom.setDescription(DESCRIPTION);
+        uom.setId("1");
+        uom.setDescription("description");
+
         //when
-        UnitOfMeasureCommand uomc = converter.convert(uom);
+        UnitOfMeasureCommand command = converter.convert(uom);
 
         //then
-        assertEquals(LONG_VALUE, uomc.getId());
-        assertEquals(DESCRIPTION, uomc.getDescription());
+        assertThat(command.getId()).isEqualTo(uom.getId());
+        assertThat(command.getDescription()).isEqualTo(uom.getDescription());
     }
 
 }

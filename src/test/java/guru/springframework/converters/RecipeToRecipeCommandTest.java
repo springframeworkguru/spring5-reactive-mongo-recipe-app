@@ -16,7 +16,8 @@ public class RecipeToRecipeCommandTest {
     private RecipeToRecipeCommand converter = new RecipeToRecipeCommand(
             new CategoryToCategoryCommand(),
             new IngredientToIngredientCommand(new UnitOfMeasureToUnitOfMeasureCommand()),
-            new NotesToNotesCommand());
+            new NotesToNotesCommand()
+    );
 
     @Test
     public void testNullObject() {

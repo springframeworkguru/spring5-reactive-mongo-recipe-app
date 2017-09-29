@@ -1,50 +1,39 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.UnitOfMeasureCommand;
-import guru.springframework.domain.UnitOfMeasure;
-import org.junit.Before;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import guru.springframework.commands.UnitOfMeasureCommand;
+import guru.springframework.domain.UnitOfMeasure;
 
 public class UnitOfMeasureCommandToUnitOfMeasureTest {
 
-    public static final String DESCRIPTION = "description";
-    public static final String LONG_VALUE = "1";
+    private UnitOfMeasureCommandToUnitOfMeasure converter = new UnitOfMeasureCommandToUnitOfMeasure();
 
-    UnitOfMeasureCommandToUnitOfMeasure converter;
-
-    @Before
-    public void setUp() throws Exception {
-        converter = new UnitOfMeasureCommandToUnitOfMeasure();
-
+    @Test
+    public void testNullParameter() {
+        assertThat(converter.convert(null)).isNull();
     }
 
     @Test
-    public void testNullParamter() throws Exception {
-        assertNull(converter.convert(null));
+    public void testEmptyObject() {
+        assertThat(converter.convert(new UnitOfMeasureCommand())).isNotNull();
     }
 
     @Test
-    public void testEmptyObject() throws Exception {
-        assertNotNull(converter.convert(new UnitOfMeasureCommand()));
-    }
-
-    @Test
-    public void convert() throws Exception {
+    public void convert() {
         //given
         UnitOfMeasureCommand command = new UnitOfMeasureCommand();
-        command.setId(LONG_VALUE);
-        command.setDescription(DESCRIPTION);
+        command.setId("1");
+        command.setDescription("description");
 
         //when
         UnitOfMeasure uom = converter.convert(command);
 
         //then
-        assertNotNull(uom);
-        assertEquals(LONG_VALUE, uom.getId());
-        assertEquals(DESCRIPTION, uom.getDescription());
-
+        assertThat(uom.getId()).isEqualTo(command.getId());
+        assertThat(uom.getDescription()).isEqualTo(command.getDescription());
     }
 
 }
