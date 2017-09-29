@@ -19,6 +19,18 @@ public class RecipeToRecipeCommandTest {
             new NotesToNotesCommand()
     );
 
+    private static Category category(String id) {
+        Category category = new Category();
+        category.setId(id);
+        return category;
+    }
+
+    private static Ingredient ingredient(String id) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(id);
+        return ingredient;
+    }
+
     @Test
     public void testNullObject() {
         assertThat(converter.convert(null)).isNull();
@@ -48,11 +60,11 @@ public class RecipeToRecipeCommandTest {
 
         recipe.setNotes(notes);
 
-        recipe.getCategories().add(new Category());
-        recipe.getCategories().add(new Category());
+        recipe.getCategories().add(category("1"));
+        recipe.getCategories().add(category("2"));
 
-        recipe.getIngredients().add(new Ingredient());
-        recipe.getIngredients().add(new Ingredient());
+        recipe.getIngredients().add(ingredient("1"));
+        recipe.getIngredients().add(ingredient("2"));
 
         //when
         RecipeCommand command = converter.convert(recipe);
