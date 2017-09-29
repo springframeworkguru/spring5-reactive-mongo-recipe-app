@@ -1,12 +1,9 @@
 package guru.springframework.services;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +17,7 @@ import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.reactive.RecipeReactiveRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RecipeServiceImplTest {
@@ -40,9 +38,11 @@ public class RecipeServiceImplTest {
 
         when(recipeReactiveRepository.findById(recipe.getId())).thenReturn(Mono.just(recipe));
 
-        Recipe recipeReturned = recipeService.findById(recipe.getId()).block();
+        StepVerifier.create(recipeService.findById(recipe.getId()))
+                .expectNext(recipe)
+                .expectComplete()
+                .verify();
 
-        assertThat(recipeReturned).isEqualTo(recipe);
         verify(recipeReactiveRepository).findById(recipe.getId());
         verify(recipeReactiveRepository, never()).findAll();
     }
@@ -59,9 +59,10 @@ public class RecipeServiceImplTest {
 
         when(recipeToRecipeCommand.convert(recipe)).thenReturn(command);
 
-        RecipeCommand commandById = recipeService.findCommandById(command.getId()).block();
-
-        assertThat(commandById).isEqualTo(command);
+        StepVerifier.create(recipeService.findCommandById(command.getId()))
+                .expectNext(command)
+                .expectComplete()
+                .verify();
 
         verify(recipeReactiveRepository).findById(recipe.getId());
         verify(recipeReactiveRepository, never()).findAll();
@@ -71,9 +72,10 @@ public class RecipeServiceImplTest {
     public void getRecipesTest() {
         when(recipeService.getRecipes()).thenReturn(Flux.just(new Recipe()));
 
-        List<Recipe> recipes = recipeService.getRecipes().collectList().block();
-
-        assertThat(recipes).hasSize(1);
+        StepVerifier.create(recipeService.getRecipes())
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
 
         verify(recipeReactiveRepository).findAll();
         verify(recipeReactiveRepository, never()).findById(anyString());
@@ -87,7 +89,9 @@ public class RecipeServiceImplTest {
         when(recipeReactiveRepository.deleteById(idToDelete)).thenReturn(Mono.empty());
 
         //when
-        recipeService.deleteById(idToDelete);
+        StepVerifier.create(recipeService.deleteById(idToDelete))
+                .expectComplete()
+                .verify();
 
         //then
         verify(recipeReactiveRepository).deleteById(idToDelete);

@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.reactive.RecipeReactiveRepository;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ImageServiceImplTest {
@@ -46,7 +47,9 @@ public class ImageServiceImplTest {
         when(recipeReactiveRepository.save(any(Recipe.class))).thenReturn(Mono.just(recipe));
 
         //when
-        imageService.saveImageFile(recipe.getId(), multipartFile).block();
+        StepVerifier.create(imageService.saveImageFile(recipe.getId(), multipartFile))
+                .expectComplete()
+                .verify();
 
         //then
         verify(recipeReactiveRepository).save(argumentCaptor.capture());

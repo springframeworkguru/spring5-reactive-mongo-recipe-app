@@ -1,6 +1,5 @@
 package guru.springframework.services;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +22,7 @@ import guru.springframework.domain.UnitOfMeasure;
 import guru.springframework.repositories.reactive.RecipeReactiveRepository;
 import guru.springframework.repositories.reactive.UnitOfMeasureReactiveRepository;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IngredientServiceImplTest {
@@ -74,11 +74,11 @@ public class IngredientServiceImplTest {
         when(recipeRepository.findById(recipe.getId())).thenReturn(Mono.just(recipe));
 
         //then
-        IngredientCommand ingredientCommand = ingredientService
-                .findByRecipeIdAndIngredientId(recipe.getId(), ingredient3.getId()).block();
+        StepVerifier.create(ingredientService.findByRecipeIdAndIngredientId(recipe.getId(), ingredient3.getId()))
+                .expectNextMatches(command -> command.getId().equals(ingredient3.getId()))
+                .expectComplete()
+                .verify();
 
-        //when
-        assertThat(ingredientCommand.getId()).isEqualTo(ingredient3.getId());
         verify(recipeRepository).findById(recipe.getId());
     }
 
@@ -101,10 +101,10 @@ public class IngredientServiceImplTest {
         when(unitOfMeasureRepository.findById(command.getUom().getId())).thenReturn(Mono.just(new UnitOfMeasure()));
 
         //when
-        IngredientCommand savedCommand = ingredientService.saveIngredientCommand(command).block();
-
-        //then
-        assertThat(savedCommand.getId()).isEqualTo(command.getId());
+        StepVerifier.create(ingredientService.saveIngredientCommand(command))
+                .expectNextMatches(savedCommand -> savedCommand.getId().equals(command.getId()))
+                .expectComplete()
+                .verify();
 
         verify(recipeRepository).findById(command.getRecipeId());
         verify(recipeRepository).save(any(Recipe.class));
@@ -123,7 +123,9 @@ public class IngredientServiceImplTest {
         when(recipeRepository.findById(recipe.getId())).thenReturn(Mono.just(recipe));
 
         //when
-        ingredientService.deleteById(recipe.getId(), ingredient.getId()).block();
+        StepVerifier.create(ingredientService.deleteById(recipe.getId(), ingredient.getId()))
+                .expectComplete()
+                .verify();
 
         //then
         verify(recipeRepository).findById(recipe.getId());
