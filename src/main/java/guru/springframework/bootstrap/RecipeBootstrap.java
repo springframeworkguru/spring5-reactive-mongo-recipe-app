@@ -49,7 +49,7 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
 
         log.error("#######");
-        log.error("Count: " + reactiveRepository.count().block().toString());
+        log.error("Count: " + reactiveRepository.count());
     }
 
     private void loadCategories(){
