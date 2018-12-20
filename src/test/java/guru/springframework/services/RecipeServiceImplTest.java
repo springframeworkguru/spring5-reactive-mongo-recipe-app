@@ -1,110 +1,99 @@
 package guru.springframework.services;
 
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import guru.springframework.commands.RecipeCommand;
-import guru.springframework.converters.RecipeCommandToRecipe;
 import guru.springframework.converters.RecipeToRecipeCommand;
 import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.reactive.RecipeReactiveRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import java.util.HashSet;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
-
-/**
- * Created by jt on 6/17/17.
- */
+@RunWith(MockitoJUnitRunner.class)
 public class RecipeServiceImplTest {
 
-    RecipeServiceImpl recipeService;
+    @Mock
+    private RecipeReactiveRepository recipeReactiveRepository;
 
     @Mock
-    RecipeReactiveRepository recipeReactiveRepository;
+    private RecipeToRecipeCommand recipeToRecipeCommand;
 
-    @Mock
-    RecipeToRecipeCommand recipeToRecipeCommand;
-
-    @Mock
-    RecipeCommandToRecipe recipeCommandToRecipe;
-
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
-        recipeService = new RecipeServiceImpl(recipeReactiveRepository, recipeCommandToRecipe, recipeToRecipeCommand);
-    }
+    @InjectMocks
+    private RecipeServiceImpl recipeService;
 
     @Test
-    public void getRecipeByIdTest() throws Exception {
+    public void getRecipeByIdTest() {
         Recipe recipe = new Recipe();
         recipe.setId("1");
 
-        when(recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(recipe));
+        when(recipeReactiveRepository.findById(recipe.getId())).thenReturn(Mono.just(recipe));
 
-        Recipe recipeReturned = recipeService.findById("1").block();
+        StepVerifier.create(recipeService.findById(recipe.getId()))
+                .expectNext(recipe)
+                .expectComplete()
+                .verify();
 
-        assertNotNull("Null recipe returned", recipeReturned);
-        verify(recipeReactiveRepository, times(1)).findById(anyString());
-        verify(recipeReactiveRepository, never()).findAll();
-    }
-
-
-    @Test
-    public void getRecipeCommandByIdTest() throws Exception {
-        Recipe recipe = new Recipe();
-        recipe.setId("1");
-
-        when(recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(recipe));
-
-        RecipeCommand recipeCommand = new RecipeCommand();
-        recipeCommand.setId("1");
-
-        when(recipeToRecipeCommand.convert(any())).thenReturn(recipeCommand);
-
-        RecipeCommand commandById = recipeService.findCommandById("1").block();
-
-        assertNotNull("Null recipe returned", commandById);
-        verify(recipeReactiveRepository, times(1)).findById(anyString());
+        verify(recipeReactiveRepository).findById(recipe.getId());
         verify(recipeReactiveRepository, never()).findAll();
     }
 
     @Test
-    public void getRecipesTest() throws Exception {
-
+    public void getRecipeCommandByIdTest() {
         Recipe recipe = new Recipe();
-        HashSet receipesData = new HashSet();
-        receipesData.add(recipe);
+        recipe.setId("1");
 
-        when(recipeService.getRecipes()).thenReturn(Flux.just(recipe));
+        when(recipeReactiveRepository.findById(recipe.getId())).thenReturn(Mono.just(recipe));
 
-        List<Recipe> recipes = recipeService.getRecipes().collectList().block();
+        RecipeCommand command = new RecipeCommand();
+        command.setId("1");
 
-        assertEquals(recipes.size(), 1);
-        verify(recipeReactiveRepository, times(1)).findAll();
+        when(recipeToRecipeCommand.convert(recipe)).thenReturn(command);
+
+        StepVerifier.create(recipeService.findCommandById(command.getId()))
+                .expectNext(command)
+                .expectComplete()
+                .verify();
+
+        verify(recipeReactiveRepository).findById(recipe.getId());
+        verify(recipeReactiveRepository, never()).findAll();
+    }
+
+    @Test
+    public void getRecipesTest() {
+        when(recipeService.getRecipes()).thenReturn(Flux.just(new Recipe()));
+
+        StepVerifier.create(recipeService.getRecipes())
+                .expectNextCount(1)
+                .expectComplete()
+                .verify();
+
+        verify(recipeReactiveRepository).findAll();
         verify(recipeReactiveRepository, never()).findById(anyString());
     }
 
     @Test
-    public void testDeleteById() throws Exception {
-
+    public void testDeleteById() {
         //given
         String idToDelete = "2";
 
-        when(recipeReactiveRepository.deleteById(anyString())).thenReturn(Mono.empty());
+        when(recipeReactiveRepository.deleteById(idToDelete)).thenReturn(Mono.empty());
 
         //when
-        recipeService.deleteById(idToDelete);
+        StepVerifier.create(recipeService.deleteById(idToDelete))
+                .expectComplete()
+                .verify();
 
         //then
-        verify(recipeReactiveRepository, times(1)).deleteById(anyString());
+        verify(recipeReactiveRepository).deleteById(idToDelete);
     }
 }

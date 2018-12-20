@@ -1,103 +1,85 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.RecipeCommand;
-import guru.springframework.domain.*;
-import org.junit.Before;
+import static guru.springframework.domain.Difficulty.EASY;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import guru.springframework.commands.RecipeCommand;
+import guru.springframework.domain.Category;
+import guru.springframework.domain.Ingredient;
+import guru.springframework.domain.Notes;
+import guru.springframework.domain.Recipe;
 
 public class RecipeToRecipeCommandTest {
 
-    public static final String RECIPE_ID = "1";
-    public static final Integer COOK_TIME = Integer.valueOf("5");
-    public static final Integer PREP_TIME = Integer.valueOf("7");
-    public static final String DESCRIPTION = "My Recipe";
-    public static final String DIRECTIONS = "Directions";
-    public static final Difficulty DIFFICULTY = Difficulty.EASY;
-    public static final Integer SERVINGS = Integer.valueOf("3");
-    public static final String SOURCE = "Source";
-    public static final String URL = "Some URL";
-    public static final String CAT_ID_1 = "1";
-    public static final String CAT_ID2 = "2";
-    public static final String INGRED_ID_1 = "3";
-    public static final String INGRED_ID_2 = "4";
-    public static final String NOTES_ID = "9";
-    RecipeToRecipeCommand converter;
+    private RecipeToRecipeCommand converter = new RecipeToRecipeCommand(
+            new CategoryToCategoryCommand(),
+            new IngredientToIngredientCommand(new UnitOfMeasureToUnitOfMeasureCommand()),
+            new NotesToNotesCommand()
+    );
 
-    @Before
-    public void setUp() throws Exception {
-        converter = new RecipeToRecipeCommand(
-                new CategoryToCategoryCommand(),
-                new IngredientToIngredientCommand(new UnitOfMeasureToUnitOfMeasureCommand()),
-                new NotesToNotesCommand());
+    private static Category category(String id) {
+        Category category = new Category();
+        category.setId(id);
+        return category;
+    }
+
+    private static Ingredient ingredient(String id) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(id);
+        return ingredient;
     }
 
     @Test
-    public void testNullObject() throws Exception {
-        assertNull(converter.convert(null));
+    public void testNullObject() {
+        assertThat(converter.convert(null)).isNull();
     }
 
     @Test
-    public void testEmptyObject() throws Exception {
-        assertNotNull(converter.convert(new Recipe()));
+    public void testEmptyObject() {
+        assertThat(converter.convert(new Recipe())).isNotNull();
     }
 
     @Test
-    public void convert() throws Exception {
+    public void convert() {
         //given
         Recipe recipe = new Recipe();
-        recipe.setId(RECIPE_ID);
-        recipe.setCookTime(COOK_TIME);
-        recipe.setPrepTime(PREP_TIME);
-        recipe.setDescription(DESCRIPTION);
-        recipe.setDifficulty(DIFFICULTY);
-        recipe.setDirections(DIRECTIONS);
-        recipe.setServings(SERVINGS);
-        recipe.setSource(SOURCE);
-        recipe.setUrl(URL);
+        recipe.setId("1");
+        recipe.setCookTime(5);
+        recipe.setPrepTime(7);
+        recipe.setDescription("My Recipe");
+        recipe.setDifficulty(EASY);
+        recipe.setDirections("Directions");
+        recipe.setServings(3);
+        recipe.setSource("Source");
+        recipe.setUrl("Some URL");
 
         Notes notes = new Notes();
-        notes.setId(NOTES_ID);
+        notes.setId("9");
 
         recipe.setNotes(notes);
 
-        Category category = new Category();
-        category.setId(CAT_ID_1);
+        recipe.getCategories().add(category("1"));
+        recipe.getCategories().add(category("2"));
 
-        Category category2 = new Category();
-        category2.setId(CAT_ID2);
-
-        recipe.getCategories().add(category);
-        recipe.getCategories().add(category2);
-
-        Ingredient ingredient = new Ingredient();
-        ingredient.setId(INGRED_ID_1);
-
-        Ingredient ingredient2 = new Ingredient();
-        ingredient2.setId(INGRED_ID_2);
-
-        recipe.getIngredients().add(ingredient);
-        recipe.getIngredients().add(ingredient2);
+        recipe.getIngredients().add(ingredient("1"));
+        recipe.getIngredients().add(ingredient("2"));
 
         //when
         RecipeCommand command = converter.convert(recipe);
 
         //then
-        assertNotNull(command);
-        assertEquals(RECIPE_ID, command.getId());
-        assertEquals(COOK_TIME, command.getCookTime());
-        assertEquals(PREP_TIME, command.getPrepTime());
-        assertEquals(DESCRIPTION, command.getDescription());
-        assertEquals(DIFFICULTY, command.getDifficulty());
-        assertEquals(DIRECTIONS, command.getDirections());
-        assertEquals(SERVINGS, command.getServings());
-        assertEquals(SOURCE, command.getSource());
-        assertEquals(URL, command.getUrl());
-        assertEquals(NOTES_ID, command.getNotes().getId());
-        assertEquals(2, command.getCategories().size());
-        assertEquals(2, command.getIngredients().size());
-
+        assertThat(command.getId()).isEqualTo(recipe.getId());
+        assertThat(command.getCookTime()).isEqualTo(recipe.getCookTime());
+        assertThat(command.getPrepTime()).isEqualTo(recipe.getPrepTime());
+        assertThat(command.getDescription()).isEqualTo(recipe.getDescription());
+        assertThat(command.getDirections()).isEqualTo(recipe.getDirections());
+        assertThat(command.getServings()).isEqualTo(recipe.getServings());
+        assertThat(command.getSource()).isEqualTo(recipe.getSource());
+        assertThat(command.getUrl()).isEqualTo(recipe.getUrl());
+        assertThat(command.getNotes().getId()).isEqualTo(recipe.getNotes().getId());
+        assertThat(command.getCategories()).hasSize(2);
+        assertThat(command.getIngredients()).hasSize(2);
     }
-
 }

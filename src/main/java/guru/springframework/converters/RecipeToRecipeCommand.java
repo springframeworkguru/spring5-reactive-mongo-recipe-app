@@ -1,39 +1,38 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.RecipeCommand;
-import guru.springframework.domain.Category;
-import guru.springframework.domain.Recipe;
-import lombok.Synchronized;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static lombok.AccessLevel.PRIVATE;
+
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by jt on 6/21/17.
- */
+import guru.springframework.commands.RecipeCommand;
+import guru.springframework.domain.Recipe;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 @Component
-public class RecipeToRecipeCommand implements Converter<Recipe, RecipeCommand>{
+public class RecipeToRecipeCommand implements Converter<Recipe, RecipeCommand> {
 
-    private final CategoryToCategoryCommand categoryConveter;
-    private final IngredientToIngredientCommand ingredientConverter;
-    private final NotesToNotesCommand notesConverter;
+    CategoryToCategoryCommand categoryConverter;
 
-    public RecipeToRecipeCommand(CategoryToCategoryCommand categoryConveter, IngredientToIngredientCommand ingredientConverter,
-                                 NotesToNotesCommand notesConverter) {
-        this.categoryConveter = categoryConveter;
-        this.ingredientConverter = ingredientConverter;
-        this.notesConverter = notesConverter;
-    }
+    IngredientToIngredientCommand ingredientConverter;
 
-    @Synchronized
+    NotesToNotesCommand notesConverter;
+
     @Nullable
     @Override
     public RecipeCommand convert(Recipe source) {
-        if (source == null) {
+        if (isNull(source)) {
             return null;
         }
 
-        final RecipeCommand command = new RecipeCommand();
+        RecipeCommand command = new RecipeCommand();
+
         command.setId(source.getId());
         command.setCookTime(source.getCookTime());
         command.setPrepTime(source.getPrepTime());
@@ -46,14 +45,18 @@ public class RecipeToRecipeCommand implements Converter<Recipe, RecipeCommand>{
         command.setImage(source.getImage());
         command.setNotes(notesConverter.convert(source.getNotes()));
 
-        if (source.getCategories() != null && source.getCategories().size() > 0){
+        if (nonNull(source.getCategories())) {
             source.getCategories()
-                    .forEach((Category category) -> command.getCategories().add(categoryConveter.convert(category)));
+                    .stream()
+                    .map(categoryConverter::convert)
+                    .forEach(command.getCategories()::add);
         }
 
-        if (source.getIngredients() != null && source.getIngredients().size() > 0){
+        if (nonNull(source.getIngredients())) {
             source.getIngredients()
-                    .forEach(ingredient -> command.getIngredients().add(ingredientConverter.convert(ingredient)));
+                    .stream()
+                    .map(ingredientConverter::convert)
+                    .forEach(command.getIngredients()::add);
         }
 
         return command;

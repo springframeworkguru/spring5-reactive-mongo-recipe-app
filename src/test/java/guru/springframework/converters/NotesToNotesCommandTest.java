@@ -1,48 +1,38 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.NotesCommand;
-import guru.springframework.domain.Notes;
-import org.junit.Before;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import guru.springframework.commands.NotesCommand;
+import guru.springframework.domain.Notes;
 
-/**
- * Created by jt on 6/21/17.
- */
 public class NotesToNotesCommandTest {
 
-    public static final String ID_VALUE = "1";
-    public static final String RECIPE_NOTES = "Notes";
-    NotesToNotesCommand converter;
-
-    @Before
-    public void setUp() throws Exception {
-        converter = new NotesToNotesCommand();
-    }
+    private NotesToNotesCommand converter = new NotesToNotesCommand();
 
     @Test
-    public void convert() throws Exception {
+    public void convert() {
         //given
         Notes notes = new Notes();
-        notes.setId(ID_VALUE);
-        notes.setRecipeNotes(RECIPE_NOTES);
+        notes.setId("1");
+        notes.setRecipeNotes("Notes");
 
         //when
-        NotesCommand notesCommand = converter.convert(notes);
+        NotesCommand command = converter.convert(notes);
 
         //then
-        assertEquals(ID_VALUE, notesCommand.getId());
-        assertEquals(RECIPE_NOTES, notesCommand.getRecipeNotes());
+        assertThat(command.getId()).isEqualTo(notes.getId());
+        assertThat(command.getRecipeNotes()).isEqualTo(notes.getRecipeNotes());
     }
 
     @Test
-    public void testNull() throws Exception {
-        assertNull(converter.convert(null));
+    public void testNull() {
+        assertThat(converter.convert(null)).isNull();
     }
 
     @Test
-    public void testEmptyObject() throws Exception {
-        assertNotNull(converter.convert(new Notes()));
+    public void testEmptyObject() {
+        assertThat(converter.convert(new Notes())).isNotNull();
     }
 }

@@ -1,35 +1,29 @@
 package guru.springframework.services;
 
+import static lombok.AccessLevel.PRIVATE;
+
+import org.springframework.stereotype.Service;
+
 import guru.springframework.commands.UnitOfMeasureCommand;
 import guru.springframework.converters.UnitOfMeasureToUnitOfMeasureCommand;
 import guru.springframework.repositories.reactive.UnitOfMeasureReactiveRepository;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import reactor.core.publisher.Flux;
 
-/**
- * Created by jt on 6/28/17.
- */
 @Service
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
 
-    private final UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
-    private final UnitOfMeasureToUnitOfMeasureCommand unitOfMeasureToUnitOfMeasureCommand;
+    UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
 
-    public UnitOfMeasureServiceImpl(UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository, UnitOfMeasureToUnitOfMeasureCommand unitOfMeasureToUnitOfMeasureCommand) {
-        this.unitOfMeasureReactiveRepository = unitOfMeasureReactiveRepository;
-        this.unitOfMeasureToUnitOfMeasureCommand = unitOfMeasureToUnitOfMeasureCommand;
-    }
+    UnitOfMeasureToUnitOfMeasureCommand unitOfMeasureToUnitOfMeasureCommand;
 
     @Override
     public Flux<UnitOfMeasureCommand> listAllUoms() {
-
-       return unitOfMeasureReactiveRepository
+        return unitOfMeasureReactiveRepository
                 .findAll()
                 .map(unitOfMeasureToUnitOfMeasureCommand::convert);
-
-//        return StreamSupport.stream(unitOfMeasureReactiveRepository.findAll()
-//                .spliterator(), false)
-//                .map(unitOfMeasureToUnitOfMeasureCommand::convert)
-//                .collect(Collectors.toSet());
     }
 }

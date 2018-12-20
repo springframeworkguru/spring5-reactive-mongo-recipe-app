@@ -1,48 +1,39 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.NotesCommand;
-import guru.springframework.domain.Notes;
-import org.junit.Before;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import guru.springframework.commands.NotesCommand;
+import guru.springframework.domain.Notes;
 
 public class NotesCommandToNotesTest {
 
-    public static final String ID_VALUE = "1";
-    public static final String RECIPE_NOTES = "Notes";
-    NotesCommandToNotes converter;
+    private NotesCommandToNotes converter = new NotesCommandToNotes();
 
-    @Before
-    public void setUp() throws Exception {
-        converter = new NotesCommandToNotes();
-
+    @Test
+    public void testNullParameter() {
+        assertThat(converter.convert(null)).isNull();
     }
 
     @Test
-    public void testNullParameter() throws Exception {
-        assertNull(converter.convert(null));
+    public void testEmptyObject() {
+        assertThat(converter.convert(new NotesCommand())).isNotNull();
     }
 
     @Test
-    public void testEmptyObject() throws Exception {
-        assertNotNull(converter.convert(new NotesCommand()));
-    }
-
-    @Test
-    public void convert() throws Exception {
+    public void convert() {
         //given
-        NotesCommand notesCommand = new NotesCommand();
-        notesCommand.setId(ID_VALUE);
-        notesCommand.setRecipeNotes(RECIPE_NOTES);
+        NotesCommand command = new NotesCommand();
+        command.setId("1");
+        command.setRecipeNotes("Notes");
 
         //when
-        Notes notes = converter.convert(notesCommand);
+        Notes notes = converter.convert(command);
 
         //then
-        assertNotNull(notes);
-        assertEquals(ID_VALUE, notes.getId());
-        assertEquals(RECIPE_NOTES, notes.getRecipeNotes());
+        assertThat(notes.getId()).isEqualTo(command.getId());
+        assertThat(notes.getRecipeNotes()).isEqualTo(command.getRecipeNotes());
     }
 
 }

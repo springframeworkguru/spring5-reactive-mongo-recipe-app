@@ -1,23 +1,23 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.IngredientCommand;
-import guru.springframework.domain.Ingredient;
-import guru.springframework.domain.Recipe;
+import static lombok.AccessLevel.PRIVATE;
+
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by jt on 6/21/17.
- */
+import guru.springframework.commands.IngredientCommand;
+import guru.springframework.domain.Ingredient;
+import guru.springframework.domain.Recipe;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 @Component
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class IngredientCommandToIngredient implements Converter<IngredientCommand, Ingredient> {
 
-    private final UnitOfMeasureCommandToUnitOfMeasure uomConverter;
-
-    public IngredientCommandToIngredient(UnitOfMeasureCommandToUnitOfMeasure uomConverter) {
-        this.uomConverter = uomConverter;
-    }
+    UnitOfMeasureCommandToUnitOfMeasure uomConverter;
 
     @Nullable
     @Override
@@ -26,10 +26,10 @@ public class IngredientCommandToIngredient implements Converter<IngredientComman
             return null;
         }
 
-        final Ingredient ingredient = new Ingredient();
+        Ingredient ingredient = new Ingredient();
         ingredient.setId(source.getId());
 
-        if(source.getRecipeId() != null){
+        if (source.getRecipeId() != null) {
             Recipe recipe = new Recipe();
             recipe.setId(source.getRecipeId());
             recipe.addIngredient(ingredient);
@@ -38,6 +38,7 @@ public class IngredientCommandToIngredient implements Converter<IngredientComman
         ingredient.setAmount(source.getAmount());
         ingredient.setDescription(source.getDescription());
         ingredient.setUom(uomConverter.convert(source.getUom()));
+
         return ingredient;
     }
 }

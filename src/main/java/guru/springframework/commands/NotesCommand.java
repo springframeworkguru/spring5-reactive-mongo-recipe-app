@@ -1,17 +1,22 @@
 package guru.springframework.commands;
 
+import static lombok.AccessLevel.PRIVATE;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
-/**
- * Created by jt on 6/21/17.
- */
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldDefaults(level = PRIVATE)
+@ToString
 public class NotesCommand {
-    private String id;
-    private String recipeNotes;
+
+    String id;
+
+    String recipeNotes;
 
 }

@@ -1,21 +1,29 @@
 package guru.springframework.commands;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.math.BigDecimal;
 
-/**
- * Created by jt on 6/21/17.
- */
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
+
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldDefaults(level = PRIVATE)
+@ToString
 public class IngredientCommand {
-    private String id;
-    private String recipeId;
-    private String description;
-    private BigDecimal amount;
-    private UnitOfMeasureCommand uom;
+
+    String id;
+
+    String recipeId;
+
+    String description;
+
+    BigDecimal amount;
+
+    UnitOfMeasureCommand uom;
 }
