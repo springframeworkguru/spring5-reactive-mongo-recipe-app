@@ -123,7 +123,7 @@ public class IngredientServiceImplTest {
         when(recipeReactiveRepository.save(any())).thenReturn(Mono.just(recipe));
 
         //when
-        ingredientService.deleteById("1", "3");
+        ingredientService.deleteById("1", "3").block();
 
         //then
         verify(recipeReactiveRepository, times(1)).findById(anyString());
