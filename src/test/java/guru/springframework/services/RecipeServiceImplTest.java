@@ -13,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -81,8 +80,6 @@ public class RecipeServiceImplTest {
     public void getRecipesTest() throws Exception {
 
         Recipe recipe = new Recipe();
-        HashSet receipesData = new HashSet();
-        receipesData.add(recipe);
 
         when(recipeService.getRecipes()).thenReturn(Flux.just(recipe));
 
@@ -102,7 +99,7 @@ public class RecipeServiceImplTest {
         when(recipeReactiveRepository.deleteById(anyString())).thenReturn(Mono.empty());
 
         //when
-        recipeService.deleteById(idToDelete);
+        recipeService.deleteById(idToDelete).block();
 
         //then
         verify(recipeReactiveRepository, times(1)).deleteById(anyString());
