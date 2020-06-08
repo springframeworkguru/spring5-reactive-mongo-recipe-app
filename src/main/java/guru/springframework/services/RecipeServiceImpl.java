@@ -42,15 +42,7 @@ public class RecipeServiceImpl implements RecipeService {
     public Mono<RecipeCommand> findCommandById(String id) {
 
        return recipeReactiveRepository.findById(id)
-                .map(recipe -> {
-                    RecipeCommand recipeCommand = recipeToRecipeCommand.convert(recipe);
-
-                    recipeCommand.getIngredients().forEach(rc -> {
-                        rc.setRecipeId(recipeCommand.getId());
-                    });
-
-                    return recipeCommand;
-                });
+                .map(recipeToRecipeCommand::convert);
     }
 
     @Override
