@@ -97,6 +97,7 @@ public class RecipeToRecipeCommandTest {
         assertEquals(NOTES_ID, command.getNotes().getId());
         assertEquals(2, command.getCategories().size());
         assertEquals(2, command.getIngredients().size());
+        command.getIngredients().forEach(ingr -> assertEquals(RECIPE_ID, ingr.getRecipeId()));
 
     }
 
