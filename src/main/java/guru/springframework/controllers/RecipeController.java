@@ -5,9 +5,11 @@ import guru.springframework.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+
+import javax.validation.Valid;
 
 /**
  * Created by jt on 6/19/17.
@@ -52,23 +54,17 @@ public class RecipeController {
     }
 
     @PostMapping("recipe")
-    public String saveOrUpdate(@ModelAttribute("recipe") RecipeCommand command){
-
-        webDataBinder.validate();
-        BindingResult bindingResult = webDataBinder.getBindingResult();
-
-        if(bindingResult.hasErrors()){
-
-            bindingResult.getAllErrors().forEach(objectError -> {
-                log.debug(objectError.toString());
-            });
-
-            return RECIPE_RECIPEFORM_URL;
-        }
-
-        RecipeCommand savedCommand = recipeService.saveRecipeCommand(command).block();
-
-        return "redirect:/recipe/" + savedCommand.getId() + "/show";
+    public Mono<String> saveOrUpdate(@Valid @ModelAttribute("recipe") Mono<RecipeCommand> command) {
+        return command.flatMap(
+                recipeCommand -> {
+                    return recipeService.saveRecipeCommand(recipeCommand)
+                            .flatMap(recipeSaved -> {
+                                return Mono.just("redirect:/recipe/" + recipeSaved.getId() + "/show");
+                            });
+                }).onErrorResume(ex -> {
+            log.error(ex.getMessage());
+            return Mono.just(RECIPE_RECIPEFORM_URL);
+        });
     }
 
     @GetMapping("recipe/{id}/delete")
