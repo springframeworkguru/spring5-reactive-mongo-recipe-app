@@ -34,10 +34,12 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	runtime('org.springframework.boot:spring-boot-devtools')
     compile('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
     compile group: 'cz.jirutka.spring', name: 'embedmongo-spring', version: '1.3.1'
 	compile 'org.webjars:bootstrap:3.3.7-1'
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('io.projectreactor:reactor-test')
 }
 
 //export test coverage
