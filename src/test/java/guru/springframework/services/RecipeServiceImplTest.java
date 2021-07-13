@@ -119,5 +119,6 @@ public class RecipeServiceImplTest {
 
         //then
         verify(recipeRepository, times(1)).deleteById(anyString());
+
     }
 }
