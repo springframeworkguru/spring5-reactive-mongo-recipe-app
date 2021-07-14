@@ -66,6 +66,6 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void deleteById(String idToDelete) {
-        recipeRepository.deleteById(idToDelete);
+        recipeRepository.deleteById(idToDelete).block();
     }
 }

@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -61,7 +60,7 @@ public class RecipeServiceImplTest {
         verify(recipeRepository, never()).findAll();
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void getRecipeByIdTestNotFound() throws Exception {
 
         Recipe recipe = new Recipe();
@@ -70,7 +69,7 @@ public class RecipeServiceImplTest {
 
         Recipe recipeReturned = recipeService.findById("1").block();
 
-        //should go boom
+        assertNull(recipeReturned.getId());
     }
 
     @Test
