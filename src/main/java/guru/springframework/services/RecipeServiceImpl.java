@@ -56,7 +56,6 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    @Transactional
     public Mono<RecipeCommand> saveRecipeCommand(RecipeCommand command) {
 
         return recipeRepository.save(recipeCommandToRecipe.convert(command))
